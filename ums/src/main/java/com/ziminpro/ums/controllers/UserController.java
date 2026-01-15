@@ -9,10 +9,12 @@ import com.ziminpro.ums.dao.UmsRepository;
 import com.ziminpro.ums.dtos.Constants;
 import com.ziminpro.ums.dtos.User;
 import com.ziminpro.ums.security.RequireRoles;
+import com.ziminpro.ums.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -39,6 +41,28 @@ public class UserController {
         return Mono.just(ResponseEntity.ok()
                 .header(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON)
                 .header(Constants.ACCEPT, Constants.APPLICATION_JSON)
+                .body(response));
+    }
+
+    @RequireRoles({"ADMIN", "SUBSCRIBER", "PRODUCER"})
+    @GetMapping("/users/me")
+    public Mono<ResponseEntity<Map<String, Object>>> getCurrentUser(ServerWebExchange exchange) {
+        Map<String, Object> response = new HashMap<>();
+        UUID userId = SecurityUtils.getCurrentUserId(exchange);
+
+        User user = umsRepository.findUserByID(userId);
+        if (user.getId() == null) {
+            response.put(Constants.CODE, "404");
+            response.put(Constants.MESSAGE, "User not found");
+            response.put(Constants.DATA, null);
+        } else {
+            response.put(Constants.CODE, "200");
+            response.put(Constants.MESSAGE, "User retrieved");
+            response.put(Constants.DATA, user);
+        }
+
+        return Mono.just(ResponseEntity.ok()
+                .header(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON)
                 .body(response));
     }
 
