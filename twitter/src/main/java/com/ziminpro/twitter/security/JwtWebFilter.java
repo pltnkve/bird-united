@@ -2,6 +2,7 @@ package com.ziminpro.twitter.security;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,11 @@ public class JwtWebFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        // КРИТИЧНО: пропускаем OPTIONS запросы (CORS preflight)
+        if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+
         Method handlerMethod = findHandlerMethod(exchange);
 
         if (handlerMethod == null) {
@@ -57,7 +63,6 @@ public class JwtWebFilter implements WebFilter {
             String email = claims.get("email", String.class);
             List<String> userRoles = claims.get("roles", List.class);
 
-            // Сохраняем в атрибутах запроса
             exchange.getAttributes().put("userId", userId);
             exchange.getAttributes().put("email", email);
             exchange.getAttributes().put("roles", userRoles);
