@@ -10,6 +10,9 @@ spring:
     username: root
     password: passw
 
+jwt:
+  secret: ${JWT_SECRET:PcAGlxBvND20hEw+7U9NA0qLbKUT12+lSkzU/73y+FzInzs+NZEHagSiC+HyoCEejKGcEshVlfUUXoKBrh1QIw==}
+
 ums:
   host: http://localhost
   port: 9000
