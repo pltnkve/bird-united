@@ -38,7 +38,7 @@ CREATE TABLE `users` (
   `id` binary(16) NOT NULL,
   `name` varchar(45) NOT NULL,
   `email` varchar(45) NOT NULL,
-  `password` varchar(45) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `created` int NOT NULL,
   `last_visit_id` binary(16) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -57,6 +57,22 @@ CREATE TABLE `users_has_roles` (
   CONSTRAINT `fk_users_has_roles_roles1` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_users_has_roles_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `refresh_tokens`;
+CREATE TABLE `refresh_tokens` (
+  `id` BINARY(16) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  `token` VARCHAR(512) NOT NULL,
+  `expires_at` BIGINT NOT NULL,
+  `created_at` BIGINT NOT NULL,
+  `revoked` BOOLEAN DEFAULT FALSE,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token_unique` (`token`),
+  KEY `user_id_idx` (`user_id`),
+  CONSTRAINT `fk_refresh_tokens_users`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `last_visit` (`id`, `in`, `out`) VALUES
 (X'306DCF05D3D64B438E066B6FFE2331FC', '1604249194', '1604249224'),

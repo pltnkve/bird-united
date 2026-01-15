@@ -39,4 +39,16 @@ public class Constants {
     public static final String GET_ALL_ROLES = "SELECT * FROM " + TABLE_ROLES;
     public static final String DELETE_USER = "DELETE FROM " + TABLE_USERS + " WHERE `id` = (UUID_TO_BIN(?));";
     public static final String DELETE_LAST_VISIT = "DELETE FROM " + TABLE_LAST_VISIT + " WHERE `id` = (UUID_TO_BIN(?));";
+
+    // JWT Auth Section
+    public static final String TABLE_REFRESH_TOKENS = "`refresh_tokens`";
+    public static final String FIND_USER_BY_EMAIL = "SELECT * FROM " + TABLE_USERS +
+            " LEFT JOIN " + TABLE_USERS_ROLES + " ON " + TABLE_USERS_ROLES + ".`users_id` = " + TABLE_USERS + ".`id`" +
+            " LEFT JOIN " + TABLE_ROLES + " ON " + TABLE_USERS_ROLES + ".`roles_id` = " + TABLE_ROLES + ".`id`" +
+            " WHERE " + TABLE_USERS + ".`email` = ?;";
+    public static final String SAVE_REFRESH_TOKEN = "INSERT INTO " + TABLE_REFRESH_TOKENS +
+            " (`id`, `user_id`, `token`, `expires_at`, `created_at`, `revoked`) VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?, ?, ?);";
+    public static final String FIND_REFRESH_TOKEN = "SELECT * FROM " + TABLE_REFRESH_TOKENS + " WHERE `token` = ? AND `revoked` = FALSE;";
+    public static final String REVOKE_TOKEN = "UPDATE " + TABLE_REFRESH_TOKENS + " SET `revoked` = TRUE WHERE `token` = ?;";
+    public static final String REVOKE_USER_TOKENS = "UPDATE " + TABLE_REFRESH_TOKENS + " SET `revoked` = TRUE WHERE `user_id` = UUID_TO_BIN(?);";
 }

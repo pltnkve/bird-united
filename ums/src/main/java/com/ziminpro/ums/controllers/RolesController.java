@@ -7,6 +7,7 @@ import java.util.Map;
 import com.ziminpro.ums.dao.UmsRepository;
 import com.ziminpro.ums.dtos.Constants;
 import com.ziminpro.ums.dtos.Roles;
+import com.ziminpro.ums.security.RequireRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +22,11 @@ public class RolesController {
     @Autowired
     private UmsRepository umsRepository;
 
-    Map<String, Object> response = new HashMap<>();
-
+    // Все авторизованные могут читать роли
+    @RequireRoles({"ADMIN", "SUBSCRIBER", "PRODUCER"})
     @RequestMapping(method = RequestMethod.GET, path = "/roles")
     public Mono<ResponseEntity<Map<String, Object>>> getAllRoles() {
+        Map<String, Object> response = new HashMap<>();
         Map<String, Roles> roles = umsRepository.findAllRoles();
         if (roles == null) {
             response.put(Constants.CODE, "500");
@@ -35,7 +37,9 @@ public class RolesController {
             response.put(Constants.MESSAGE, "List of Roles has been requested successfully");
             response.put(Constants.DATA, new ArrayList<>(roles.values()));
         }
-        return Mono.just(ResponseEntity.ok().header(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON)
-                .header(Constants.ACCEPT, Constants.APPLICATION_JSON).body(response));
+        return Mono.just(ResponseEntity.ok()
+                .header(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON)
+                .header(Constants.ACCEPT, Constants.APPLICATION_JSON)
+                .body(response));
     }
 }

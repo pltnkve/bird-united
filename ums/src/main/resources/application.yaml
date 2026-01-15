@@ -9,3 +9,8 @@ spring:
     url: jdbc:mysql://0.0.0.0:3306/ums?serverTimezone=UTC&useLegacyDatetimeCode=false
     username: root
     password: passw
+
+jwt:
+  secret: ${JWT_SECRET:PcAGlxBvND20hEw+7U9NA0qLbKUT12+lSkzU/73y+FzInzs+NZEHagSiC+HyoCEejKGcEshVlfUUXoKBrh1QIw==}
+  access-token-expiration: 900000      # 15 минут
+  refresh-token-expiration: 604800000  # 7 дней

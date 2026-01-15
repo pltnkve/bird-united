@@ -1,10 +1,12 @@
 package com.ziminpro.ums.dao;
 
-import java.util.Map;
-import java.util.UUID;
-
+import com.ziminpro.ums.dtos.RefreshToken;
 import com.ziminpro.ums.dtos.Roles;
 import com.ziminpro.ums.dtos.User;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface UmsRepository {
 
@@ -16,5 +18,15 @@ public interface UmsRepository {
 
     UUID createUser(User user);
 
-	int deleteUser(UUID userId);
+    int deleteUser(UUID userId);
+
+    Optional<User> findUserByEmail(String email);
+
+    void saveRefreshToken(RefreshToken token);
+
+    Optional<RefreshToken> findRefreshTokenByToken(String token);
+
+    void revokeRefreshToken(String token);
+
+    void revokeAllUserTokens(UUID userId);
 }
