@@ -2,10 +2,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { fetchWithAuth, logout, isAuthenticated } from '@/auth/auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {fetchWithAuth, logout} from '@/auth/auth';
+import {withAuth} from '@/auth/with-auth';
 
 interface User {
 	id: string;
@@ -14,30 +14,23 @@ interface User {
 	roles: Array<{ role: string }>;
 }
 
-export default function DashboardPage() {
-	const router = useRouter()
+function DashboardPage() {
 	const [user, setUser] = useState<User | null>(null)
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
-		if (!isAuthenticated()) {
-			router.push('/login')
-			return
-		}
-
-		// Загружаем данные пользователя
-		fetchWithAuth('http://localhost:9000/users')
+		fetchWithAuth('http://localhost:9000/users/me')
 			.then(res => res.json())
 			.then(data => {
-				if (data.code === '200' && data.data.length > 0) {
-					setUser(data.data[0]) // временно берём первого юзера
+				if (data.code === '200') {
+					setUser(data.data)
 				}
 			})
 			.catch(() => {
 				logout()
 			})
 			.finally(() => setLoading(false))
-	}, [router])
+	}, [])
 
 	if (loading) {
 		return <div className="flex min-h-screen items-center justify-center">Загрузка...</div>
@@ -69,3 +62,5 @@ export default function DashboardPage() {
 		</div>
 	)
 }
+
+export default withAuth(DashboardPage)
