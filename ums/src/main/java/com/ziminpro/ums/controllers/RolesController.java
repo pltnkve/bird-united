@@ -22,7 +22,6 @@ public class RolesController {
     @Autowired
     private UmsRepository umsRepository;
 
-    // Все авторизованные могут читать роли
     @RequireRoles({"ADMIN", "SUBSCRIBER", "PRODUCER"})
     @RequestMapping(method = RequestMethod.GET, path = "/roles")
     public Mono<ResponseEntity<Map<String, Object>>> getAllRoles() {

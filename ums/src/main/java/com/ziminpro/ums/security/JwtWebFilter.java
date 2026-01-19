@@ -33,20 +33,16 @@ public class JwtWebFilter implements WebFilter {
         String path = exchange.getRequest().getPath().value();
         String method = exchange.getRequest().getMethod().name();
 
-        // Находим метод контроллера для текущего запроса
         Method handlerMethod = findHandlerMethod(exchange);
 
-        // Если метод не найден, пропускаем (404 обработает Spring)
         if (handlerMethod == null) {
             return chain.filter(exchange);
         }
 
-        // Проверяем @PublicEndpoint
         if (handlerMethod.isAnnotationPresent(PublicEndpoint.class)) {
             return chain.filter(exchange);
         }
 
-        // Извлекаем и проверяем токен
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -66,7 +62,6 @@ public class JwtWebFilter implements WebFilter {
             exchange.getAttributes().put("email", email);
             exchange.getAttributes().put("roles", userRoles);
 
-            // Проверяем @RequireRoles
             if (handlerMethod.isAnnotationPresent(RequireRoles.class)) {
                 RequireRoles requireRoles = handlerMethod.getAnnotation(RequireRoles.class);
                 String[] requiredRoles = requireRoles.value();
@@ -103,9 +98,7 @@ public class JwtWebFilter implements WebFilter {
                     return entry.getValue().getMethod();
                 }
             }
-        } catch (Exception e) {
-            // Если не нашли метод, вернем null
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 

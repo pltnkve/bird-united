@@ -23,7 +23,6 @@ public class UserController {
     @Autowired
     private UmsRepository umsRepository;
 
-    // Все авторизованные могут читать список
     @RequireRoles({"ADMIN", "SUBSCRIBER", "PRODUCER"})
     @RequestMapping(method = RequestMethod.GET, path = "/users")
     public Mono<ResponseEntity<Map<String, Object>>> getAllUsers() {
@@ -66,7 +65,6 @@ public class UserController {
                 .body(response));
     }
 
-    // Все авторизованные могут читать конкретного юзера
     @RequireRoles({"ADMIN", "SUBSCRIBER", "PRODUCER"})
     @RequestMapping(method = RequestMethod.GET, path = "/users/user/{user-id}")
     public Mono<ResponseEntity<Map<String, Object>>> getUser(
@@ -88,7 +86,6 @@ public class UserController {
                 .body(response));
     }
 
-    // Только ADMIN может создавать юзеров
     @RequireRoles({"ADMIN"})
     @RequestMapping(method = RequestMethod.POST, path = "/users/user", consumes = Constants.APPLICATION_JSON)
     public Mono<ResponseEntity<Map<String, Object>>> createUser(@RequestBody User user) {
@@ -109,7 +106,6 @@ public class UserController {
                 .body(response));
     }
 
-    // Только ADMIN может удалять юзеров
     @RequireRoles({"ADMIN"})
     @RequestMapping(method = RequestMethod.DELETE, path = "/users/user/{user-id}")
     public Mono<ResponseEntity<Map<String, Object>>> deleteUser(
