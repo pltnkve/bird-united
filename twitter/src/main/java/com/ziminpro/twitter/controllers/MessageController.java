@@ -21,7 +21,6 @@ public class MessageController {
     @Autowired
     private MessagesService messages;
 
-    // Все авторизованные могут читать сообщение
     @RequireRoles({"ADMIN", "PRODUCER", "SUBSCRIBER"})
     @RequestMapping(method = RequestMethod.GET, path = Constants.URI_MESSAGE + "/{message-id}")
     public Mono<ResponseEntity<Map<String, Object>>> getMessagebyId(
@@ -29,7 +28,6 @@ public class MessageController {
         return messages.getMessagebyId(UUID.fromString(messageId));
     }
 
-    // Все авторизованные могут читать сообщения продюсера
     @RequireRoles({"ADMIN", "PRODUCER", "SUBSCRIBER"})
     @RequestMapping(method = RequestMethod.GET, path = Constants.URI_PRODUCER + "/{producer-id}")
     public Mono<ResponseEntity<Map<String, Object>>> getMessagesForProducerById(
@@ -37,14 +35,12 @@ public class MessageController {
         return messages.getMessagesForProducerById(UUID.fromString(producerId));
     }
 
-    // Подписчики читают свою ленту
     @RequireRoles({"SUBSCRIBER", "ADMIN"})
     @RequestMapping(method = RequestMethod.GET, path = Constants.URI_SUBSCRIBER + "/{subscriber-id}")
     public Mono<ResponseEntity<Map<String, Object>>> getMessagesForSubscriberById(
             @PathVariable(value = "subscriber-id", required = true) String subscriberId,
             ServerWebExchange exchange) {
 
-        // Юзер может читать только СВОЮ ленту (кроме ADMIN)
         UUID currentUserId = SecurityUtils.getCurrentUserId(exchange);
         if (!SecurityUtils.hasRole(exchange, "ADMIN") && !currentUserId.toString().equals(subscriberId)) {
             return Mono.just(ResponseEntity.status(403).body(
@@ -55,14 +51,12 @@ public class MessageController {
         return messages.getMessagesForSubscriberById(UUID.fromString(subscriberId));
     }
 
-    // Только PRODUCER может создавать сообщения
     @RequireRoles({"PRODUCER", "ADMIN"})
     @RequestMapping(method = RequestMethod.POST, path = Constants.URI_MESSAGE, consumes = Constants.APPLICATION_JSON)
     public Mono<ResponseEntity<Map<String, Object>>> createMessage(
             @RequestBody Message message,
             ServerWebExchange exchange) {
 
-        // Продюсер может создавать сообщения только от своего имени (кроме ADMIN)
         UUID currentUserId = SecurityUtils.getCurrentUserId(exchange);
         if (!SecurityUtils.hasRole(exchange, "ADMIN") && !currentUserId.equals(message.getAuthor())) {
             return Mono.just(ResponseEntity.status(403).body(
@@ -73,7 +67,6 @@ public class MessageController {
         return messages.createMessage(message);
     }
 
-    // Только автор или ADMIN может удалить сообщение
     @RequireRoles({"PRODUCER", "ADMIN"})
     @RequestMapping(method = RequestMethod.DELETE, path = Constants.URI_MESSAGE + "/{message-id}")
     public Mono<ResponseEntity<Map<String, Object>>> deleteMessageById(

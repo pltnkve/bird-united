@@ -31,7 +31,6 @@ public class JwtWebFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        // КРИТИЧНО: пропускаем OPTIONS запросы (CORS preflight)
         if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
             return chain.filter(exchange);
         }
@@ -42,12 +41,10 @@ public class JwtWebFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        // Проверяем @PublicEndpoint
         if (handlerMethod.isAnnotationPresent(PublicEndpoint.class)) {
             return chain.filter(exchange);
         }
 
-        // Извлекаем токен
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -67,7 +64,6 @@ public class JwtWebFilter implements WebFilter {
             exchange.getAttributes().put("email", email);
             exchange.getAttributes().put("roles", userRoles);
 
-            // Проверяем @RequireRoles
             if (handlerMethod.isAnnotationPresent(RequireRoles.class)) {
                 RequireRoles requireRoles = handlerMethod.getAnnotation(RequireRoles.class);
                 String[] requiredRoles = requireRoles.value();
@@ -104,9 +100,7 @@ public class JwtWebFilter implements WebFilter {
                     return entry.getValue().getMethod();
                 }
             }
-        } catch (Exception e) {
-            // ignore
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 

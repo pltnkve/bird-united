@@ -21,7 +21,6 @@ public class SubscriptionController {
     @Autowired
     private SubscriptionsService subscriptionsService;
 
-    // Подписчик может читать только СВОИ подписки
     @RequireRoles({"SUBSCRIBER", "ADMIN"})
     @RequestMapping(method = RequestMethod.GET, path = Constants.URI_SUBSCRIPTION + "/{subscriber-id}")
     public Mono<ResponseEntity<Map<String, Object>>> getSubscriptionBySubscriberId(
@@ -38,7 +37,6 @@ public class SubscriptionController {
         return subscriptionsService.getSubscriptionsForSubscriberById(subscriberId);
     }
 
-    // Подписчик может изменить только СВОИ подписки
     @RequireRoles({"SUBSCRIBER", "ADMIN"})
     @RequestMapping(method = RequestMethod.PUT, path = Constants.URI_SUBSCRIPTIONS, consumes = Constants.APPLICATION_JSON)
     public Mono<ResponseEntity<Map<String, Object>>> updateSubscription(
@@ -55,7 +53,6 @@ public class SubscriptionController {
         return subscriptionsService.updateSubscriptionForSubscriberById(subscription);
     }
 
-    // Подписчик может создать только СВОИ подписки
     @RequireRoles({"SUBSCRIBER", "ADMIN"})
     @RequestMapping(method = RequestMethod.POST, path = Constants.URI_SUBSCRIPTIONS, consumes = Constants.APPLICATION_JSON)
     public Mono<ResponseEntity<Map<String, Object>>> createSubscription(
@@ -72,7 +69,6 @@ public class SubscriptionController {
         return subscriptionsService.createSubscription(subscription);
     }
 
-    // Подписчик может удалить только СВОИ подписки
     @RequireRoles({"SUBSCRIBER", "ADMIN"})
     @RequestMapping(method = RequestMethod.DELETE, path = Constants.URI_SUBSCRIPTION + "/{subscriber-id}")
     public Mono<ResponseEntity<Map<String, Object>>> deleteSubscription(
