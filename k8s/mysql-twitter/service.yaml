@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-twitter
+  namespace: twitter-app
+spec:
+  selector:
+    app: mysql-twitter
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP

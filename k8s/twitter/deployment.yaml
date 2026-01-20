@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: twitter
+  namespace: twitter-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: twitter
+  template:
+    metadata:
+      labels:
+        app: twitter
+    spec:
+      containers:
+        - name: twitter
+          image: twitter:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9001
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: MYSQL_HOST
+              value: "mysql-twitter"
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_DATABASE
+              value: "twitter"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: mysql-root-password
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt-secret
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9001
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9001
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"

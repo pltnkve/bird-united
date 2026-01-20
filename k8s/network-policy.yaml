@@ -1,0 +1,162 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-policy
+  namespace: twitter-app
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 3000
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: ums
+      ports:
+        - protocol: TCP
+          port: 9000
+    - to:
+        - podSelector:
+            matchLabels:
+              app: twitter
+      ports:
+        - protocol: TCP
+          port: 9001
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ums-policy
+  namespace: twitter-app
+spec:
+  podSelector:
+    matchLabels:
+      app: ums
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 9000
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mysql-ums
+      ports:
+        - protocol: TCP
+          port: 3306
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: twitter-policy
+  namespace: twitter-app
+spec:
+  podSelector:
+    matchLabels:
+      app: twitter
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 9001
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mysql-twitter
+      ports:
+        - protocol: TCP
+          port: 3306
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-ums-policy
+  namespace: twitter-app
+spec:
+  podSelector:
+    matchLabels:
+      app: mysql-ums
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ums
+      ports:
+        - protocol: TCP
+          port: 3306
+
+  egress: []
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-twitter-policy
+  namespace: twitter-app
+spec:
+  podSelector:
+    matchLabels:
+      app: mysql-twitter
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: twitter
+      ports:
+        - protocol: TCP
+          port: 3306
+
+  egress: []
