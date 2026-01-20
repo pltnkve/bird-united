@@ -4,6 +4,10 @@ server:
 
 ## MySQL
 spring:
+  application:
+    name: ums
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://0.0.0.0:3306/ums?serverTimezone=UTC&useLegacyDatetimeCode=false

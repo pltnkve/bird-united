@@ -4,6 +4,10 @@ server:
 
 ## MySQL
 spring:
+  application:
+    name: twitter
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/twitter?serverTimezone=UTC&useLegacyDatetimeCode=false
